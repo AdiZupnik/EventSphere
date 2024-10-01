@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "741992068849",
+    "project_id": "eventsphere-f0f82",
+    "storage_bucket": "eventsphere-f0f82.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:741992068849:android:055a1c0a93672796871b50",
+        "android_client_info": {
+          "package_name": "com.example.eventsphere"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBRUaw7Jnztm6NophfNKKEAIbG-3S2F1q0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
