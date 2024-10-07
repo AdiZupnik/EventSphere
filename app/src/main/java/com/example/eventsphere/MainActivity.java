@@ -1,6 +1,10 @@
 package com.example.eventsphere;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -10,15 +14,40 @@ import androidx.core.view.WindowInsetsCompat;
 
 public class MainActivity extends AppCompatActivity {
 
+    private EditText searchEditText;
+    private Button searchButton;
+    private TextView resultTextView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
+
+        searchEditText = findViewById(R.id.searchEditText);
+        searchButton = findViewById(R.id.searchButton);
+        resultTextView = findViewById(R.id.resultTextView);
+
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String searchQuery = searchEditText.getText().toString();
+                String searchResult = searchEvents(searchQuery);
+                resultTextView.setText(searchResult);
+            }
         });
+    }
+
+    private String searchEvents(String query) {
+        // This is a mock implementation. In a real app, you would query a database or API.
+        switch (query.toLowerCase()) {
+            case "concert":
+                return "Found: Rock Concert, July 15, 8 PM, $50";
+            case "theater":
+                return "Found: Shakespeare Play, August 5, 7 PM, $40";
+            case "sports":
+                return "Found: Football Match, September 10, 3 PM, $60";
+            default:
+                return "No events found for '" + query + "'";
+        }
     }
 }
