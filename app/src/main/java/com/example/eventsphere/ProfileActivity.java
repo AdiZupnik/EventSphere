@@ -1,6 +1,8 @@
 package com.example.eventsphere;
 
 import android.os.Bundle;
+import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,12 +15,24 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_profile);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
+
+        // Get buttons
+        Button editButton = findViewById(R.id.editButton);
+        Button settingsButton = findViewById(R.id.settingsButton);
+        Button logoutButton = findViewById(R.id.logoutButton);
+
+        // Set button clicks
+        editButton.setOnClickListener(view -> {
+            Toast.makeText(this, "Edit Profile Clicked", Toast.LENGTH_SHORT).show();
+        });
+
+        settingsButton.setOnClickListener(view -> {
+            Toast.makeText(this, "Settings Clicked", Toast.LENGTH_SHORT).show();
+        });
+
+        logoutButton.setOnClickListener(view -> {
+            Toast.makeText(this, "Logout Clicked", Toast.LENGTH_SHORT).show();
         });
     }
 }
