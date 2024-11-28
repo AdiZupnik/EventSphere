@@ -11,6 +11,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
+import androidx.navigation.ui.NavigationUI;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -26,6 +31,14 @@ public class MainActivity extends AppCompatActivity {
         searchEditText = findViewById(R.id.searchEditText);
         searchButton = findViewById(R.id.searchButton);
         resultTextView = findViewById(R.id.resultTextView);
+        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+        NavController navController = navHostFragment.getNavController();
+
+        // Get the Bottom Navigation View
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
+
+        // Connect the Navigation Graph and Bottom Navigation View
+        NavigationUI.setupWithNavController(bottomNavigationView, navController);
 
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
