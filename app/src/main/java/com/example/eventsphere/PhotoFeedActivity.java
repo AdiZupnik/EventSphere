@@ -2,6 +2,7 @@ package com.example.eventsphere;
 
 import android.os.Bundle;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,6 +15,9 @@ public class PhotoFeedActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo_feed);
+
+        // Toast message when the page opens
+        Toast.makeText(this, "Photo Feed Page", Toast.LENGTH_SHORT).show();
 
         // Find and set the images
         ImageView image1 = findViewById(R.id.image1);
