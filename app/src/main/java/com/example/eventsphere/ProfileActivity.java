@@ -17,6 +17,9 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
+        // Toast message when the page opens
+        Toast.makeText(this, "Edit Profile Page", Toast.LENGTH_SHORT).show();
+
         // Get buttons
         Button editButton = findViewById(R.id.editButton);
         Button settingsButton = findViewById(R.id.settingsButton);
