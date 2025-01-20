@@ -1,6 +1,9 @@
 package com.example.eventsphere;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -8,15 +11,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.navigation.NavController;
-import androidx.navigation.fragment.NavHostFragment;
-import androidx.navigation.ui.NavigationUI;
-
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -29,20 +29,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Toast message when the page opens
-        Toast.makeText(this, "Main Page", Toast.LENGTH_SHORT).show();
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         searchEditText = findViewById(R.id.searchEditText);
         searchButton = findViewById(R.id.searchButton);
         resultTextView = findViewById(R.id.resultTextView);
-        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
-        NavController navController = navHostFragment.getNavController();
-
-        // Get the Bottom Navigation View
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
-
-        // Connect the Navigation Graph and Bottom Navigation View
-        NavigationUI.setupWithNavController(bottomNavigationView, navController);
 
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -52,6 +44,37 @@ public class MainActivity extends AppCompatActivity {
                 resultTextView.setText(searchResult);
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int itemId = item.getItemId();
+        if (itemId == R.id.menu_profile) {
+            Intent intent1 = new Intent(this, ProfileActivity.class);
+            startActivity(intent1);
+            // Toast message when the page opens
+            Toast.makeText(this, "Edit Profile Page", Toast.LENGTH_SHORT).show();
+            return true;
+        } else if (itemId == R.id.menu_photo) {
+            Intent intent2 = new Intent(this, PhotoFeedActivity.class);
+            startActivity(intent2);
+            // Toast message when the page opens
+            Toast.makeText(this, "Photo feed page", Toast.LENGTH_SHORT).show();
+            return true;
+        } else if (itemId == R.id.menu_search) {
+            Intent intent3 = new Intent(this, MainActivity.class);
+            startActivity(intent3);
+            // Toast message when the page opens
+            Toast.makeText(this, "Search page", Toast.LENGTH_SHORT).show();
+            return true;
+        }
+        return false;
     }
 
     private String searchEvents(String query) {
