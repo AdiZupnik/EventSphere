@@ -70,6 +70,13 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "Search page", Toast.LENGTH_SHORT).show();
             return true;
         }
+        else if (itemId == R.id.menu_user_managment) {
+            Intent intent4 = new Intent(this, UserManagementActivity.class);
+            startActivity(intent4);
+            // Toast message when the page opens
+            Toast.makeText(this, "user managment page" , Toast.LENGTH_SHORT).show();
+            return true;
+        }
         return false;
     }
 
