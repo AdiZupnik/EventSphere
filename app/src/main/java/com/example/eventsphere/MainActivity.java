@@ -14,6 +14,13 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+
 public class MainActivity extends AppCompatActivity {
 
     private EditText searchEditText;
@@ -36,8 +43,56 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String searchQuery = searchEditText.getText().toString();
-                String searchResult = searchEvents(searchQuery);
-                resultTextView.setText(searchResult);
+                searchEvents(searchQuery);
+            }
+        });
+        addEventToDatabase("Rock Concert", "July 15, 2025", 50.00, "8 PM");
+        addEventToDatabase("Jazz Festival", "August 20, 2025", 75.00, "6 PM");
+        addEventToDatabase("Taylor Swift Concert", "September 5, 2025", 60.00, "7:30 PM");
+        addEventToDatabase("StendUp Night", "October 31, 2025", 40.00, "10 PM");
+        addEventToDatabase("Country Music Fest", "November 15, 2025", 55.00, "5 PM");
+
+    }
+    private void addEventToDatabase(String type, String date, double price, String time) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference eventsRef = database.getReference("events");
+
+        String eventId = eventsRef.push().getKey();
+        Event event = new Event(type, date, price, time);
+
+        eventsRef.child(eventId).setValue(event)
+                .addOnSuccessListener(aVoid -> Toast.makeText(MainActivity.this, "Event added successfully", Toast.LENGTH_SHORT).show())
+                .addOnFailureListener(e -> Toast.makeText(MainActivity.this, "Failed to add event: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+    }
+
+    private void searchEvents(String query) {
+        DatabaseReference eventsRef = FirebaseDatabase.getInstance().getReference("events");
+        Query searchQuery = eventsRef.orderByChild("searchField")
+                .startAt(query.toLowerCase())
+                .endAt(query.toLowerCase() + "\uf8ff");
+
+        searchQuery.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                StringBuilder result = new StringBuilder();
+                for (DataSnapshot eventSnapshot : dataSnapshot.getChildren()) {
+                    Event event = eventSnapshot.getValue(Event.class);
+                    if (event != null) {
+                        result.append("Found: ").append(event.type)
+                                .append(", ").append(event.date)
+                                .append(", ").append(event.time)
+                                .append(", $").append(event.price).append("\n");
+                    }
+                }
+                if (result.length() == 0) {
+                    result.append("No events found for '").append(query).append("'");
+                }
+                resultTextView.setText(result.toString());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                resultTextView.setText("Error: " + databaseError.getMessage());
             }
         });
     }
@@ -74,23 +129,11 @@ public class MainActivity extends AppCompatActivity {
             Intent intent4 = new Intent(this, UserManagementActivity.class);
             startActivity(intent4);
             // Toast message when the page opens
-            Toast.makeText(this, "user managment page" , Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "user management page" , Toast.LENGTH_SHORT).show();
             return true;
         }
         return false;
     }
 
-    private String searchEvents(String query) {
-        // This is a mock implementation. In a real app, you would query a database or API.
-        switch (query.toLowerCase()) {
-            case "concert":
-                return "Found: Rock Concert, July 15, 8 PM, $50";
-            case "theater":
-                return "Found: Shakespeare Play, August 5, 7 PM, $40";
-            case "sports":
-                return "Found: Football Match, September 10, 3 PM, $60";
-            default:
-                return "No events found for '" + query + "'";
-        }
-    }
+
 }
