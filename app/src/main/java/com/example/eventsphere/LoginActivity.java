@@ -29,6 +29,8 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Objects;
 
@@ -36,9 +38,11 @@ public class LoginActivity extends AppCompatActivity {
     FirebaseAuth auth;
     GoogleSignInClient googleSignInClient;
     ShapeableImageView imageView;
-    TextView name, mail;
-    private final ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+    TextView nameTextView, mailTextView;
+    FirebaseDatabase database;
+    DatabaseReference usersRef;
 
+    private final ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
         public void onActivityResult(ActivityResult result) {
             if (result.getResultCode() == RESULT_OK) {
                 Task<GoogleSignInAccount> accountTask = GoogleSignIn.getSignedInAccountFromIntent(result.getData());
@@ -51,12 +55,19 @@ public class LoginActivity extends AppCompatActivity {
                             if (task.isSuccessful()) {
                                 auth = FirebaseAuth.getInstance();
                                 Glide.with(LoginActivity.this).load(Objects.requireNonNull(auth.getCurrentUser()).getPhotoUrl()).into(imageView);
-                                name.setText(auth.getCurrentUser().getDisplayName());
-                                mail.setText(auth.getCurrentUser().getEmail());
-                                Toast.makeText(LoginActivity.this, "Sign in successfully!", Toast.LENGTH_SHORT).show();
-                                Intent intent = new Intent(LoginActivity.this,MainActivity.class);
-                                intent.putExtra("USERNAME",auth.getCurrentUser().getDisplayName());
+                                String name = auth.getCurrentUser().getDisplayName();
+                                String email = auth.getCurrentUser().getEmail();
+                                nameTextView.setText(name);
+                                mailTextView.setText(email);
 
+                                // Save user data to Realtime Database
+                                String userId = auth.getCurrentUser().getUid();
+                                User user = new User(name, email);
+                                usersRef.child(userId).setValue(user);
+
+                                Toast.makeText(LoginActivity.this, "Sign in successfully!", Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                intent.putExtra("USERNAME", name);
                                 startActivity(intent);
                             } else {
                                 Toast.makeText(LoginActivity.this, "Failed to sign in: " + task.getException(), Toast.LENGTH_SHORT).show();
@@ -69,6 +80,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         }
     });
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,18 +89,25 @@ public class LoginActivity extends AppCompatActivity {
 
         FirebaseApp.initializeApp(this);
         imageView = findViewById(R.id.profileImage);
-        name = findViewById(R.id.nameTV);
-        mail = findViewById(R.id.mailTV);
+        nameTextView = findViewById(R.id.nameTV);
+        mailTextView = findViewById(R.id.mailTV);
 
-        GoogleSignInOptions options = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestIdToken(getString(R.string.client_id)).requestEmail().build() ;
-        googleSignInClient = GoogleSignIn.getClient(LoginActivity.this,options);
-        auth = FirebaseAuth.getInstance() ;
-        SignInButton signInButton = findViewById(R.id.signIn) ;
+        // Initialize Firebase Database
+        database = FirebaseDatabase.getInstance();
+        usersRef = database.getReference("users");
+
+        GoogleSignInOptions options = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.client_id))
+                .requestEmail()
+                .build();
+        googleSignInClient = GoogleSignIn.getClient(LoginActivity.this, options);
+        auth = FirebaseAuth.getInstance();
+        SignInButton signInButton = findViewById(R.id.signIn);
         signInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = googleSignInClient.getSignInIntent() ;
-                activityResultLauncher.launch(intent) ;
+                Intent intent = googleSignInClient.getSignInIntent();
+                activityResultLauncher.launch(intent);
             }
         });
     }
