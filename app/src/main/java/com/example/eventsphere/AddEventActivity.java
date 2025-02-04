@@ -36,7 +36,7 @@ public class AddEventActivity extends AppCompatActivity {
     }
 
     private void addEventToDatabase() {
-        String type = typeEditText.getText().toString().trim();
+        String type = typeEditText.getText().toString().trim();//trim() removes spaces at the beginning and end of the string for easier match
         String date = dateEditText.getText().toString().trim();
         String priceStr = priceEditText.getText().toString().trim();
         String time = timeEditText.getText().toString().trim();
@@ -47,9 +47,9 @@ public class AddEventActivity extends AppCompatActivity {
         }
 
         double price;
-        try {
+        try {//try to parse the price as a double
             price = Double.parseDouble(priceStr);
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {//if the price is not a number
             Toast.makeText(this, "Invalid price format", Toast.LENGTH_SHORT).show();
             return;
         }
