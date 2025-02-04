@@ -63,6 +63,12 @@ public class PhotoFeedActivity extends AppCompatActivity {
             Toast.makeText(this, "Search page", Toast.LENGTH_SHORT).show();
             return true;
         }
+        else if (itemId == R.id.menu_add_event) {
+            Intent intent = new Intent(this, AddEventActivity.class);
+            startActivity(intent);
+            Toast.makeText(this, "Add Event page", Toast.LENGTH_SHORT).show();
+            return true;
+        }
         return false;
     }
 

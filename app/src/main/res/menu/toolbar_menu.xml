@@ -13,4 +13,8 @@
     <item
         android:id="@+id/menu_user_managment"
         android:title="user management" />
+    <item
+        android:id="@+id/menu_add_event"
+        android:title="Add Event" />
+
 </menu>
