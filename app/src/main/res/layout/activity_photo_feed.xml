@@ -2,6 +2,7 @@
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -14,37 +15,36 @@
             android:id="@+id/toolbar"
             layout="@layout/toolbar_layout" />
 
-        <ImageView
-            android:id="@+id/image1"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/photoRecyclerView"
             android:layout_width="0dp"
-            android:layout_height="300dp"
-            android:layout_marginTop="92dp"
-            android:scaleType="centerCrop"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageView
-            android:id="@+id/image2"
-            android:layout_width="0dp"
-            android:layout_height="300dp"
-            android:scaleType="centerCrop"
-            android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@id/image1"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
-
-        <ImageView
-            android:id="@+id/image3"
-            android:layout_width="0dp"
-            android:layout_height="300dp"
-            android:scaleType="centerCrop"
-            android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@id/image2"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toBottomOf="@id/toolbar"
+            app:layout_constraintBottom_toTopOf="@id/uploadButton"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"/>
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="0dp"
+            android:layout_height="300dp"
+            android:src="@drawable/placeholder_image"
+            app:layout_constraintTop_toBottomOf="@id/toolbar"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="16dp"/>
+
+        <Button
+            android:id="@+id/uploadButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Upload Image"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="16dp"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

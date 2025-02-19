@@ -47,11 +47,10 @@ dependencies {
     implementation ("com.google.android.gms:play-services-auth:20.7.0")
     implementation("androidx.navigation:navigation-fragment-ktx:2.6.0")
     implementation("androidx.navigation:navigation-ui-ktx:2.6.0")
-    // Import the Firebase BoM
     implementation ("com.google.firebase:firebase-bom:33.8.0")
-    // Add the dependency for the Realtime Database library
     implementation ("com.google.firebase:firebase-database")
-    // Optional: Add Firebase Authentication if you're using it
     implementation ("com.google.firebase:firebase-auth")
+    implementation ("com.android.volley:volley:1.2.1")
+
 
 }

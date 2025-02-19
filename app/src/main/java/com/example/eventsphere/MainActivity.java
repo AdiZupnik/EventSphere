@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        setSupportActionBar(toolbar);//sets the toolbar as the action bar for the activity
 
         searchEditText = findViewById(R.id.searchEditText);
         searchButton = findViewById(R.id.searchButton);
@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String searchQuery = searchEditText.getText().toString();
+                String searchQuery = searchEditText.getText().toString();//gets the text from the search edit text
                 searchEvents(searchQuery);
             }
         });

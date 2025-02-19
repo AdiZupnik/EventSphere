@@ -1,0 +1,64 @@
+@startuml
+class UserManagementActivity {
+- FirebaseAuth auth
+- FirebaseUser user
+- DatabaseReference userRef
+- TextView userNameTextView
+- TextView userEmailTextView
+- Button editProfileButton
+- Button deleteAccountButton
+}
+
+class AddEventActivity {
+- EditText typeEditText
+- Button addEventButton
+}
+
+class ExampleUnitTest {
+}
+class Event {
++ String type
++ String date
++ String time
++ double price
++ String searchField
+}
+
+class LoginActivity {
+~ FirebaseAuth auth
+~ GoogleSignInClient googleSignInClient
+~ ShapeableImageView imageView
+~ TextView nameTextView
+~ FirebaseDatabase database
+~ DatabaseReference usersRef
+- ActivityResultLauncher<Intent> activityResultLauncher
+}
+
+class ProfileActivity {
+}
+class ExampleInstrumentedTest {
+}
+class User {
++ String userId
++ String name
++ String mail
++ String profile
+}
+
+class MainActivity {
+- EditText searchEditText
+- Button searchButton
+- TextView resultTextView
+}
+
+class PhotoFeedActivity {
+}
+
+
+AppCompatActivity <|-- UserManagementActivity
+AppCompatActivity <|-- AddEventActivity
+AppCompatActivity <|-- LoginActivity
+AppCompatActivity <|-- ProfileActivity
+AppCompatActivity <|-- MainActivity
+AppCompatActivity <|-- PhotoFeedActivity
+@enduml
