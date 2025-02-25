@@ -51,6 +51,8 @@ dependencies {
     implementation ("com.google.firebase:firebase-database")
     implementation ("com.google.firebase:firebase-auth")
     implementation ("com.android.volley:volley:1.2.1")
+    implementation ("com.google.firebase:firebase-storage:20.3.0")
+
 
 
 }

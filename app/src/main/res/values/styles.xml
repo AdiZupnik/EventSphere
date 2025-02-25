@@ -5,6 +5,9 @@
         <item name="cornerSize">50%</item>
     </style>
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-
+    </style>
+    <style name="ToolbarPopupTheme" parent="ThemeOverlay.AppCompat.Light">
+        <item name="android:background">@color/purple</item>
+        <item name="android:textColor">#FFFFFF</item>
     </style>
 </resources>
