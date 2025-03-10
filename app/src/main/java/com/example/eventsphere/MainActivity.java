@@ -1,12 +1,17 @@
 package com.example.eventsphere;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,80 +26,218 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import org.osmdroid.api.IMapController;
+import org.osmdroid.config.Configuration;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.Marker;
+
 public class MainActivity extends AppCompatActivity {
 
     private EditText searchEditText;
     private Button searchButton;
-    private TextView resultTextView;
+    private LinearLayout resultTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // OSMDroid configuration initialization
+        Configuration.getInstance().load(this, getPreferences(MODE_PRIVATE));
+
         setContentView(R.layout.activity_main);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);//sets the toolbar as the action bar for the activity
+        setSupportActionBar(toolbar);
 
         searchEditText = findViewById(R.id.searchEditText);
         searchButton = findViewById(R.id.searchButton);
         resultTextView = findViewById(R.id.resultTextView);
 
-        searchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String searchQuery = searchEditText.getText().toString();//gets the text from the search edit text
-                searchEvents(searchQuery);
-            }
-        });
-        addEventToDatabase("Rock Concert", "July 15, 2025", 50.00, "8 PM");
-        addEventToDatabase("Jazz Festival", "August 20, 2025", 75.00, "6 PM");
-        addEventToDatabase("Taylor Swift Concert", "September 5, 2025", 60.00, "7:30 PM");
-        addEventToDatabase("StendUp Night", "October 31, 2025", 40.00, "10 PM");
-        addEventToDatabase("Country Music Fest", "November 15, 2025", 55.00, "5 PM");
+        searchButton.setOnClickListener(v -> handleSearch());
 
+        // Example events with coordinates
+        addEventToDatabase("Rock Concert", "July 15, 2025", 50.00, "8 PM",
+                "rock@example.com", "+15551234567", 37.7749, -122.4194);
+        addEventToDatabase("Jazz Festival", "August 20, 2025", 75.00, "6 PM",
+                "jazz@example.com", "+15552345678", 40.7128, -74.0060);
     }
-    private void addEventToDatabase(String type, String date, double price, String time) {
+
+    private void addEventToDatabase(String type, String date, double price, String time,
+                                    String sellerEmail, String sellerPhone, double lat, double lng) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference eventsRef = database.getReference("events");
 
-        String eventId = eventsRef.push().getKey();
-        Event event = new Event(type, date, price, time);
+        Event event = new Event(type, date, price, time, sellerEmail, sellerPhone, lat, lng);
+        eventsRef.push().setValue(event)
+                .addOnSuccessListener(aVoid -> Toast.makeText(this, "Event added", Toast.LENGTH_SHORT).show())
+                .addOnFailureListener(e -> Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+    }
 
-        eventsRef.child(eventId).setValue(event)
-                .addOnSuccessListener(aVoid -> Toast.makeText(MainActivity.this, "Event added successfully", Toast.LENGTH_SHORT).show())
-                .addOnFailureListener(e -> Toast.makeText(MainActivity.this, "Failed to add event: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+    private void handleSearch() {
+        String query = searchEditText.getText().toString().trim();
+        if (!query.isEmpty()) {
+            searchEvents(query);
+        } else {
+            Toast.makeText(this, "Please enter a search query", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void searchEvents(String query) {
-        DatabaseReference eventsRef = FirebaseDatabase.getInstance().getReference("events");
-        Query searchQuery = eventsRef.orderByChild("searchField")
+        Query searchQuery = FirebaseDatabase.getInstance().getReference("events")
+                .orderByChild("searchField")
                 .startAt(query.toLowerCase())
                 .endAt(query.toLowerCase() + "\uf8ff");
 
         searchQuery.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                StringBuilder result = new StringBuilder();
-                for (DataSnapshot eventSnapshot : dataSnapshot.getChildren()) {
-                    Event event = eventSnapshot.getValue(Event.class);
+                resultTextView.removeAllViews();
+
+                if (!dataSnapshot.exists()) {
+                    showNoResults(query);
+                    return;
+                }
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Event event = snapshot.getValue(Event.class);
                     if (event != null) {
-                        result.append("Found: ").append(event.type)
-                                .append(", ").append(event.date)
-                                .append(", ").append(event.time)
-                                .append(", $").append(event.price).append("\n");
+                        createEventCard(event);
                     }
                 }
-                if (result.length() == 0) {
-                    result.append("No events found for '").append(query).append("'");
-                }
-                resultTextView.setText(result.toString());
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                resultTextView.setText("Error: " + databaseError.getMessage());
+            public void onCancelled(@NonNull DatabaseError error) {
+                showError(error.getMessage());
             }
         });
+    }
+
+    private void createEventCard(Event event) {
+        LinearLayout cardLayout = new LinearLayout(this);
+        cardLayout.setOrientation(LinearLayout.VERTICAL);
+        cardLayout.setPadding(0, 0, 0, 32);
+
+        // Event Details
+        TextView details = new TextView(this);
+        details.setText(String.format("%s\nDate: %s\nTime: %s\nPrice: $%.2f",
+                event.getType(), event.getDate(), event.getTime(), event.getPrice()));
+        cardLayout.addView(details);
+
+        // Button Container
+        LinearLayout buttonContainer = new LinearLayout(this);
+        buttonContainer.setOrientation(LinearLayout.HORIZONTAL);
+
+        Button contactBtn = createButton("Contact Seller", v -> showContactOptions(event));
+        Button navigateBtn = createButton("Navigate", v -> showNavigationOptions(event));
+
+        buttonContainer.addView(contactBtn);
+        buttonContainer.addView(navigateBtn);
+        cardLayout.addView(buttonContainer);
+
+        resultTextView.addView(cardLayout);
+    }
+
+    private Button createButton(String text, View.OnClickListener listener) {
+        Button btn = new Button(this);
+        btn.setText(text);
+        btn.setLayoutParams(new LinearLayout.LayoutParams(
+                0,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                1
+        ));
+        btn.setOnClickListener(listener);
+        return btn;
+    }
+
+    private void showNavigationOptions(Event event) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Choose Navigation Method")
+                .setItems(new String[]{"Open in Maps App", "Show Embedded Map"}, (dialog, which) -> {
+                    if (which == 0) {
+                        openMapsApp(event);
+                    } else {
+                        showEmbeddedMap(event);
+                    }
+                })
+                .show();
+    }
+
+    private void openMapsApp(Event event) {
+        Uri gmmIntentUri = Uri.parse("geo:" + event.getLatitude() + "," + event.getLongitude());
+        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+        mapIntent.setPackage("net.osmand");
+
+        if (mapIntent.resolveActivity(getPackageManager()) != null) {
+            startActivity(mapIntent);
+        } else {
+            Toast.makeText(this, "No maps app installed", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void showEmbeddedMap(Event event) {
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(R.layout.osm_map_dialog)
+                .setPositiveButton("Close", null)
+                .show();
+
+        MapView mapView = dialog.findViewById(R.id.mapView);
+        if (mapView == null) {
+            Toast.makeText(this, "Error loading map", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        mapView.setTileSource(TileSourceFactory.MAPNIK);
+        IMapController controller = mapView.getController();
+        GeoPoint point = new GeoPoint(event.getLatitude(), event.getLongitude());
+        controller.setCenter(point);
+        controller.setZoom(15);
+
+        Marker marker = new Marker(mapView);
+        marker.setPosition(point);
+        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        mapView.getOverlays().add(marker);
+    }
+
+    private void showContactOptions(Event event) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Contact Seller");
+        String[] options = {"Email", "WhatsApp"};
+        builder.setItems(options, (dialog, which) -> {
+            switch (which) {
+                case 0: // Email
+                    sendEmail(event.getSellerEmail());
+                    break;
+                case 1: // WhatsApp
+                    openWhatsApp(event.getSellerPhone());
+                    break;
+            }
+        });
+        builder.show();
+    }
+
+    private void sendEmail(String email) {
+        Intent intent = new Intent(Intent.ACTION_SENDTO);
+        intent.setData(Uri.parse("mailto:" + email));
+        intent.putExtra(Intent.EXTRA_SUBJECT, "Inquiry about event ticket");
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        } else {
+            Toast.makeText(this, "No email app found", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void openWhatsApp(String phone) {
+        String url = "https://api.whatsapp.com/send?phone=" + phone;
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(url));
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        } else {
+            Toast.makeText(this, "WhatsApp not installed", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -106,41 +249,43 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int itemId = item.getItemId();
-        if (itemId == R.id.menu_profile) {
-            Intent intent1 = new Intent(this, ProfileActivity.class);
-            startActivity(intent1);
-            // Toast message when the page opens
-            Toast.makeText(this, "Edit Profile Page", Toast.LENGTH_SHORT).show();
-            return true;
-        } else if (itemId == R.id.menu_photo) {
-            Intent intent2 = new Intent(this, PhotoFeedActivity.class);
-            startActivity(intent2);
-            // Toast message when the page opens
-            Toast.makeText(this, "Photo feed page", Toast.LENGTH_SHORT).show();
-            return true;
-        } else if (itemId == R.id.menu_search) {
-            Intent intent3 = new Intent(this, MainActivity.class);
-            startActivity(intent3);
-            // Toast message when the page opens
-            Toast.makeText(this, "Search page", Toast.LENGTH_SHORT).show();
-            return true;
-        }
-        else if (itemId == R.id.menu_user_managment) {
-            Intent intent4 = new Intent(this, UserManagementActivity.class);
-            startActivity(intent4);
-            // Toast message when the page opens
-            Toast.makeText(this, "user management page" , Toast.LENGTH_SHORT).show();
-            return true;
-        }
-        else if (itemId == R.id.menu_add_event) {
+
+        if (itemId == R.id.menu_add_event) {
             Intent intent = new Intent(this, AddEventActivity.class);
             startActivity(intent);
             Toast.makeText(this, "Add Event page", Toast.LENGTH_SHORT).show();
             return true;
+        } else if (itemId == R.id.menu_profile) {
+            Intent intent = new Intent(this, ProfileActivity.class);
+            startActivity(intent);
+            Toast.makeText(this, "Profile page", Toast.LENGTH_SHORT).show();
+            return true;
+        } else if (itemId == R.id.menu_photo) {
+            Intent intent = new Intent(this, PhotoFeedActivity.class);
+            startActivity(intent);
+            Toast.makeText(this, "Photo Feed", Toast.LENGTH_SHORT).show();
+            return true;
+        } else if (itemId == R.id.menu_search) {
+            Toast.makeText(this, "Search event", Toast.LENGTH_SHORT).show();
+            return true;
+        } else if (itemId == R.id.menu_user_managment) {
+            Intent intent = new Intent(this, UserManagementActivity.class);
+            startActivity(intent);
+            Toast.makeText(this, "User managment", Toast.LENGTH_SHORT).show();
+            return true;
         }
 
-        return false;
+        return super.onOptionsItemSelected(item);
     }
 
+    private void showNoResults(String query) {
+        TextView noResults = new TextView(this);
+        noResults.setText("No events found for '" + query + "'");
+        noResults.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        resultTextView.addView(noResults);
+    }
 
+    private void showError(String message) {
+        Toast.makeText(this, "Error: " + message, Toast.LENGTH_LONG).show();
+    }
 }

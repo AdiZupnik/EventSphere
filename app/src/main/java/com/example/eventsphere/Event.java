@@ -1,22 +1,42 @@
 package com.example.eventsphere;
 
 public class Event {
-    public String type;
-    public String date;
-    public String time;
-    public double price;
-    public String searchField;
+    private String type;
+    private String date;
+    private double price;
+    private String time;
+    private String sellerEmail;
+    private String sellerPhone;
+    private String searchField;  // Search optimization field
+    private double latitude;
+    private double longitude;
 
     public Event() {
+        // Required empty constructor
     }
 
-    public Event(String type, String date, double price, String time) {
+    public Event(String type, String date, double price, String time,
+                 String sellerEmail, String sellerPhone, double lat, double lng) {
         this.type = type;
         this.date = date;
         this.price = price;
         this.time = time;
-        this.searchField = (type).toLowerCase();
+        this.sellerEmail = sellerEmail;
+        this.sellerPhone = sellerPhone;
+        this.latitude = lat;
+        this.longitude = lng;
+        this.searchField = type.trim().toLowerCase();
     }
+
+    // Add these getters/setters
+    public String getSearchField() {
+        return searchField;
+    }
+
+    public void setSearchField(String searchField) {
+        this.searchField = searchField;
+    }
+
 
     public String getDate() {
         return date;
@@ -49,4 +69,20 @@ public class Event {
     public void setType(String type) {
         this.type = type;
     }
+    public String getSellerEmail() {
+        return sellerEmail;
+    }
+
+    public void setSellerEmail(String sellerEmail) {
+        this.sellerEmail = sellerEmail;
+    }
+    public String getSellerPhone() {
+        return sellerPhone;
+    }
+
+    public void setSellerPhone(String sellerPhone) {
+        this.sellerPhone = sellerPhone;
+    }
+    public double getLatitude() { return latitude; }
+    public double getLongitude() { return longitude; }
 }

@@ -9,31 +9,52 @@
         android:id="@+id/typeEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Event Type" />
+        android:hint="Event Type"
+        android:layout_marginBottom="8dp"/>
 
     <EditText
         android:id="@+id/dateEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Date" />
-
-    <EditText
-        android:id="@+id/priceEditText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Price"
-        android:inputType="numberDecimal" />
+        android:hint="Date (e.g., July 15, 2025)"
+        android:layout_marginBottom="8dp"/>
 
     <EditText
         android:id="@+id/timeEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Time" />
+        android:hint="Time (e.g., 8 PM)"
+        android:layout_marginBottom="8dp"/>
+
+    <EditText
+        android:id="@+id/priceEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Price (e.g., 50.00)"
+        android:inputType="numberDecimal"
+        android:layout_marginBottom="8dp"/>
+
+    <EditText
+        android:id="@+id/sellerEmailEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Seller Email"
+        android:inputType="textEmailAddress"
+        android:layout_marginBottom="8dp"/>
+
+    <EditText
+        android:id="@+id/sellerPhoneEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Seller Phone Number"
+        android:inputType="phone"
+        android:layout_marginBottom="16dp"/>
 
     <Button
         android:id="@+id/addEventButton"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Add Event" />
+        android:text="Add Event"
+        android:layout_gravity="center_horizontal"/>
 
 </LinearLayout>

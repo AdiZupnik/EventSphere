@@ -9,19 +9,21 @@ class UserManagementActivity {
 - Button deleteAccountButton
 }
 
+class ExampleUnitTest {
+}
 class AddEventActivity {
 - EditText typeEditText
 - Button addEventButton
 }
 
-class ExampleUnitTest {
-}
 class Event {
-+ String type
-+ String date
-+ String time
-+ double price
-+ String searchField
+- String type
+- String date
+- double price
+- String time
+- String sellerEmail
+- String sellerPhone
+- String searchField
 }
 
 class LoginActivity {
@@ -34,10 +36,10 @@ class LoginActivity {
 - ActivityResultLauncher<Intent> activityResultLauncher
 }
 
-class ProfileActivity {
+class Photo {
+- String imageUrl
 }
-class ExampleInstrumentedTest {
-}
+
 class User {
 + String userId
 + String name
@@ -45,20 +47,48 @@ class User {
 + String profile
 }
 
+class ProfileActivity {
+}
+class PhotoUploadActivity {
+- {static} int PICK_IMAGE_REQUEST
+- ImageView imageView
+- Button chooseImageButton
+- Uri imageUri
+}
+
+class ExampleInstrumentedTest {
+}
 class MainActivity {
 - EditText searchEditText
 - Button searchButton
-- TextView resultTextView
+- LinearLayout resultTextView
 }
 
 class PhotoFeedActivity {
+- RecyclerView photoRecyclerView
+- PhotoAdapter photoAdapter
+- List<Photo> photoList
+- FloatingActionButton addPhotoFab
 }
+
+class PhotoAdapter {
+- List<Photo> photoList
+}
+
+class PhotoAdapter$PhotoViewHolder {
+~ ImageView photoImageView
+}
+
 
 
 AppCompatActivity <|-- UserManagementActivity
 AppCompatActivity <|-- AddEventActivity
 AppCompatActivity <|-- LoginActivity
 AppCompatActivity <|-- ProfileActivity
+AppCompatActivity <|-- PhotoUploadActivity
 AppCompatActivity <|-- MainActivity
 AppCompatActivity <|-- PhotoFeedActivity
+Adapter <|-- PhotoAdapter
+PhotoAdapter +.. PhotoAdapter$PhotoViewHolder
+ViewHolder <|-- PhotoAdapter$PhotoViewHolder
 @enduml

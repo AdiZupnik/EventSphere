@@ -15,7 +15,7 @@ import com.google.firebase.database.FirebaseDatabase;
 public class AddEventActivity extends AppCompatActivity {
 
     // Declare UI elements
-    private EditText typeEditText, dateEditText, priceEditText, timeEditText;
+    private EditText typeEditText, dateEditText, priceEditText, timeEditText, sellerEmailEditText, sellerPhoneEditText;
     private Button addEventButton;
 
     @Override
@@ -28,6 +28,8 @@ public class AddEventActivity extends AppCompatActivity {
         dateEditText = findViewById(R.id.dateEditText);
         priceEditText = findViewById(R.id.priceEditText);
         timeEditText = findViewById(R.id.timeEditText);
+        sellerEmailEditText = findViewById(R.id.sellerEmailEditText);
+        sellerPhoneEditText = findViewById(R.id.sellerPhoneEditText);
         addEventButton = findViewById(R.id.addEventButton);
 
         // Set click listener for the add event button
@@ -45,9 +47,11 @@ public class AddEventActivity extends AppCompatActivity {
         String date = dateEditText.getText().toString().trim();
         String priceStr = priceEditText.getText().toString().trim();
         String time = timeEditText.getText().toString().trim();
+        String sellerEmail = sellerEmailEditText.getText().toString().trim();
+        String sellerPhone = sellerPhoneEditText.getText().toString().trim();
 
         // Check if any field is empty
-        if (type.isEmpty() || date.isEmpty() || priceStr.isEmpty() || time.isEmpty()) {
+        if (type.isEmpty() || date.isEmpty() || priceStr.isEmpty() || time.isEmpty() || sellerEmail.isEmpty() || sellerPhone.isEmpty()) {
             Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -62,33 +66,32 @@ public class AddEventActivity extends AppCompatActivity {
             return;
         }
 
+        // Example latitude and longitude (replace with actual values if needed)
+        double latitude = 37.7749;  // Example: San Francisco latitude
+        double longitude = -122.4194; // Example: San Francisco longitude
+
         // Get instance of Firebase database
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        // Get reference to "events" node in the database
         DatabaseReference eventsRef = database.getReference("events");
 
         // Generate a unique key for the new event
         String eventId = eventsRef.push().getKey();
-        // Create a new Event object
-        Event event = new Event(type, date, price, time);
+
+        // Create a new Event object with all required parameters
+        Event event = new Event(type, date, price, time, sellerEmail, sellerPhone, latitude, longitude);
 
         // Add the event to the database
         eventsRef.child(eventId).setValue(event)
                 .addOnSuccessListener(aVoid -> {
-                    // If successful, show success message
                     Toast.makeText(AddEventActivity.this, "Event added successfully", Toast.LENGTH_SHORT).show();
-                    // Create intent to return to MainActivity
                     Intent intent = new Intent(AddEventActivity.this, MainActivity.class);
-                    // Clear activity stack and reuse existing MainActivity if it's running
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                    // Start MainActivity
                     startActivity(intent);
-                    // Close current activity
                     finish();
                 })
                 .addOnFailureListener(e -> {
-                    // If failed, show error message
                     Toast.makeText(AddEventActivity.this, "Failed to add event: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
+
 }
